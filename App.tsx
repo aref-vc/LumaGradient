@@ -41,7 +41,10 @@ const App: React.FC = () => {
       const newStops: ColorStop[] = result.colors.map((color, index) => ({
         id: `gen-${index}`,
         color: color,
-        position: Math.round((index / (result.colors.length - 1)) * 100)
+        position: Math.round((index / (result.colors.length - 1)) * 100),
+        // Add default random spread for mesh gradients
+        x: 0.2 + Math.random() * 0.6,
+        y: 0.2 + Math.random() * 0.6
       }));
 
       setGradientConfig(prev => ({
@@ -161,10 +164,15 @@ const App: React.FC = () => {
               <div className="absolute top-4 left-4 z-20 bg-black/40 backdrop-blur px-3 py-1 rounded-full border border-white/10">
                 <span className="font-mono text-xs text-white/70">Preview Mode</span>
               </div>
-              <GradientPreview config={gradientConfig} className="w-full h-[60vh] lg:h-full" />
+              
+              <GradientPreview 
+                config={gradientConfig} 
+                className="w-full h-[60vh] lg:h-full" 
+                onUpdate={setGradientConfig}
+              />
               
               {uploadedImage && (
-                 <div className="absolute bottom-6 left-6 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/20 hover:scale-150 transition-transform origin-bottom-left z-20">
+                 <div className="absolute bottom-6 left-6 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/20 hover:scale-150 transition-transform origin-bottom-left z-20 pointer-events-none">
                    <img src={uploadedImage} alt="Source" className="w-full h-full object-cover" />
                  </div>
               )}

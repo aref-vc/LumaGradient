@@ -43,7 +43,15 @@ const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analy
     // Find a gap or add to end
     const lastPos = config.stops[config.stops.length - 1].position;
     const newPos = Math.min(lastPos + 10, 100);
-    const newStop: ColorStop = { id: newId, color: '#ffffff', position: newPos };
+    
+    const newStop: ColorStop = { 
+      id: newId, 
+      color: '#ffffff', 
+      position: newPos,
+      // Random position for 2D meshes
+      x: 0.2 + Math.random() * 0.6,
+      y: 0.2 + Math.random() * 0.6
+    };
     onChange({ ...config, stops: [...config.stops, newStop] });
   };
 
@@ -86,6 +94,11 @@ const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analy
               </svg>
             </div>
           </div>
+          {(config.type === 'mesh' || config.type === 'gaussian') && (
+            <p className="text-xs text-peach font-mono animate-pulse mt-2">
+              ✨ Tip: Drag dots on the preview to warp colors!
+            </p>
+          )}
         </div>
 
         {/* Angle (Conditional) */}
