@@ -1,5 +1,5 @@
 import React from 'react';
-import { GradientConfig, ColorStop } from '../types.ts';
+import { GradientConfig, ColorStop, GradientType } from '../types.ts';
 import Button from './Button.tsx';
 
 interface ControlsProps {
@@ -11,8 +11,8 @@ interface ControlsProps {
 
 const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analysisData }) => {
   
-  const handleTypeChange = (type: 'linear' | 'radial') => {
-    onChange({ ...config, type });
+  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({ ...config, type: e.target.value as GradientType });
   };
 
   const handleAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,43 +63,51 @@ const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analy
       {/* Main Controls */}
       <div className="space-y-8 flex-1">
         
-        {/* Type & Angle */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex bg-grey/10 rounded-lg p-1">
-            <button 
-              onClick={() => handleTypeChange('linear')}
-              className={`flex-1 py-2 text-sm font-mono rounded transition-colors ${config.type === 'linear' ? 'bg-vibrant text-white' : 'text-grey hover:text-white'}`}
+        {/* Type Selection */}
+        <div className="space-y-2">
+          <label className="font-body text-offwhite text-sm font-bold">Algorithm</label>
+          <div className="relative">
+            <select
+              value={config.type}
+              onChange={handleTypeChange}
+              className="w-full bg-grey/10 border border-grey/30 rounded-lg p-3 text-offwhite appearance-none focus:border-vibrant outline-none font-body font-bold cursor-pointer hover:bg-grey/20 transition-colors"
             >
-              Linear
-            </button>
-            <button 
-              onClick={() => handleTypeChange('radial')}
-              className={`flex-1 py-2 text-sm font-mono rounded transition-colors ${config.type === 'radial' ? 'bg-vibrant text-white' : 'text-grey hover:text-white'}`}
-            >
-              Radial
-            </button>
+              <option value="linear">Linear Gradient</option>
+              <option value="radial">Radial Gradient</option>
+              <option value="conic">Conic Gradient</option>
+              <option value="mesh">Mesh Gradient</option>
+              <option value="gaussian">Gaussian Diffusion</option>
+              <option value="bezier">Bezier Flow</option>
+              <option value="noise">Noise / Cloud</option>
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-peach">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
           </div>
-          
-          {config.type === 'linear' && (
-             <div className="flex items-center gap-3">
-               <span className="font-mono text-xs text-grey">deg</span>
-               <input 
-                 type="range" 
-                 min="0" 
-                 max="360" 
-                 value={config.angle} 
-                 onChange={handleAngleChange}
-                 className="flex-1 h-1 bg-grey/30 rounded-lg appearance-none cursor-pointer accent-vibrant"
-               />
-               <span className="font-mono text-xs text-peach w-8 text-right">{config.angle}°</span>
-             </div>
-          )}
         </div>
+
+        {/* Angle (Conditional) */}
+        {(config.type === 'linear' || config.type === 'conic') && (
+           <div className="flex items-center gap-3 bg-grey/10 p-4 rounded-lg">
+             <span className="font-mono text-xs text-grey">ANGLE</span>
+             <input 
+               type="range" 
+               min="0" 
+               max="360" 
+               value={config.angle} 
+               onChange={handleAngleChange}
+               className="flex-1 h-1 bg-grey/30 rounded-lg appearance-none cursor-pointer accent-vibrant"
+             />
+             <span className="font-mono text-xs text-peach w-8 text-right">{config.angle}°</span>
+           </div>
+        )}
 
         {/* Noise Control */}
         <div>
           <div className="flex justify-between mb-2">
-            <label className="font-body text-offwhite text-sm font-bold">Grain / Noise</label>
+            <label className="font-body text-offwhite text-sm font-bold">Grain / Texture</label>
             <span className="font-mono text-xs text-peach">{(config.noise * 100).toFixed(0)}%</span>
           </div>
           <input 
@@ -116,14 +124,14 @@ const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analy
         {/* Stops */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <label className="font-body text-offwhite text-sm font-bold">Colors & Positions</label>
-            <button onClick={addStop} className="text-vibrant text-xs font-mono hover:text-white">+ Add Color</button>
+            <label className="font-body text-offwhite text-sm font-bold">Palette Control</label>
+            <button onClick={addStop} className="text-vibrant text-xs font-mono hover:text-white transition-colors uppercase tracking-wider">+ Add Color</button>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
             {config.stops.map((stop) => (
-              <div key={stop.id} className="flex items-center gap-3 group">
-                <div className="relative w-8 h-8 rounded-full overflow-hidden border border-grey/50">
+              <div key={stop.id} className="flex items-center gap-3 group bg-grey/5 p-2 rounded-lg border border-transparent hover:border-grey/20 transition-all">
+                <div className="relative w-8 h-8 rounded-full overflow-hidden border border-grey/50 shadow-sm">
                   <input 
                     type="color" 
                     value={stop.color}
@@ -144,8 +152,9 @@ const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analy
                 <span className="font-mono text-xs text-grey w-8 text-right">{stop.position}%</span>
                 <button 
                   onClick={() => removeStop(stop.id)}
-                  className="text-grey hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="text-grey hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
                   disabled={config.stops.length <= 2}
+                  title="Remove color"
                 >
                   &times;
                 </button>

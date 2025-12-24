@@ -4,9 +4,11 @@ export interface ColorStop {
   position: number;
 }
 
+export type GradientType = 'linear' | 'radial' | 'conic' | 'mesh' | 'gaussian' | 'bezier' | 'noise';
+
 export interface GradientConfig {
-  type: 'linear' | 'radial';
-  angle: number; // For linear
+  type: GradientType;
+  angle: number; // For linear/conic
   stops: ColorStop[];
   noise: number; // 0 to 1
 }

@@ -60,15 +60,23 @@ const App: React.FC = () => {
     if (format === 'css') {
       const stops = [...gradientConfig.stops].sort((a,b) => a.position - b.position)
         .map(s => `${s.color} ${s.position}%`).join(', ');
-      const css = gradientConfig.type === 'linear' 
-        ? `background: linear-gradient(${gradientConfig.angle}deg, ${stops});`
-        : `background: radial-gradient(circle, ${stops});`;
+      
+      let css = '';
+      if (gradientConfig.type === 'linear') {
+        css = `background: linear-gradient(${gradientConfig.angle}deg, ${stops});`;
+      } else if (gradientConfig.type === 'radial') {
+        css = `background: radial-gradient(circle, ${stops});`;
+      } else if (gradientConfig.type === 'conic') {
+        css = `background: conic-gradient(from ${gradientConfig.angle}deg, ${stops});`;
+      } else {
+        alert("This complex gradient type (Mesh/Bezier/Noise) cannot be exported as simple CSS. Please download the PNG instead.");
+        return;
+      }
       
       navigator.clipboard.writeText(css);
-      alert('CSS copied to clipboard!'); // Could be a nicer toast
+      alert('CSS copied to clipboard!'); 
     } else {
       // For PNG, we need to grab the canvas from the Preview component. 
-      // We can use a custom event or simply assume the canvas is present in DOM.
       const canvas = document.querySelector('canvas');
       if (canvas) {
         const link = document.createElement('a');
