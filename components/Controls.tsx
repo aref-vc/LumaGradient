@@ -48,7 +48,7 @@ const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analy
   };
 
   return (
-    <div className="flex flex-col h-full bg-dark/50 backdrop-blur-md p-6 rounded-2xl border border-grey/20 animate-slide-up overflow-y-auto">
+    <div className="flex flex-col h-full bg-dark/50 backdrop-blur-md p-6 rounded-2xl border border-grey/20 animate-slide-up overflow-y-auto custom-scrollbar">
       
       {/* Header Info */}
       <div className="mb-8 border-b border-grey/30 pb-4">
@@ -128,7 +128,7 @@ const Controls: React.FC<ControlsProps> = ({ config, onChange, onDownload, analy
             <button onClick={addStop} className="text-vibrant text-xs font-mono hover:text-white transition-colors uppercase tracking-wider">+ Add Color</button>
           </div>
           
-          <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-3">
             {config.stops.map((stop) => (
               <div key={stop.id} className="flex items-center gap-3 group bg-grey/5 p-2 rounded-lg border border-transparent hover:border-grey/20 transition-all">
                 <div className="relative w-8 h-8 rounded-full overflow-hidden border border-grey/50 shadow-sm">
